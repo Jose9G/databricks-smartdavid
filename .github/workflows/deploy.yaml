@@ -1,0 +1,125 @@
+name: Deploy Notebooks to Databricks
+
+on:
+  push:
+    branches:
+      - main        # Deploy a producción al hacer push a main
+  pull_request:
+    branches:
+      - dev         # Validación al hacer PR hacia dev
+
+jobs:
+  deploy:
+    name: Deploy ETL Notebooks - SmartDavid
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Paso 1: Clonar el repositorio ─────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # ── Paso 2: Instalar Python ────────────────────────────────────
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # ── Paso 3: Instalar Databricks CLI ───────────────────────────
+      - name: Install Databricks CLI
+        run: |
+          pip install databricks-cli
+          databricks --version
+
+      # ── Paso 4: Configurar autenticación con Databricks ───────────
+      - name: Configure Databricks CLI
+        run: |
+          databricks configure --token <<EOF
+          ${{ secrets.DATABRICKS_HOST }}
+          ${{ secrets.DATABRICKS_TOKEN }}
+          EOF
+
+      # ── Paso 5: Verificar conexión con el workspace ────────────────
+      - name: Verify Databricks connection
+        run: |
+          databricks workspace ls /
+
+      # ── Paso 6: Crear estructura de carpetas en workspace ──────────
+      - name: Create workspace folders
+        run: |
+          databricks workspace mkdirs /Users/joose5573@gmail.com/databricks-smartdavid/proceso         || true
+          databricks workspace mkdirs /Users/joose5573@gmail.com/databricks-smartdavid/scrips          || true
+          databricks workspace mkdirs /Users/joose5573@gmail.com/databricks-smartdavid/seguridad       || true
+          databricks workspace mkdirs /Users/joose5573@gmail.com/databricks-smartdavid/reversion       || true
+          databricks workspace mkdirs /Users/joose5573@gmail.com/databricks-smartdavid/dashboard       || true
+          databricks workspace mkdirs /Users/joose5573@gmail.com/databricks-smartdavid/certificaciones || true
+
+      # ── Paso 7: Deploy carpeta proceso (notebooks ETL) ─────────────
+      - name: Deploy proceso - ETL Notebooks
+        run: |
+          databricks workspace import_dir proceso/ \
+            /Users/joose5573@gmail.com/databricks-smartdavid/proceso \
+            --overwrite \
+            --exclude-hidden-files
+
+      # ── Paso 8: Deploy carpeta scrips (preparación ambiente) ───────
+      - name: Deploy scrips - SQL Scripts
+        run: |
+          databricks workspace import_dir scrips/ \
+            /Users/joose5573@gmail.com/databricks-smartdavid/scrips \
+            --overwrite \
+            --exclude-hidden-files
+
+      # ── Paso 9: Deploy carpeta seguridad (grants) ──────────────────
+      - name: Deploy seguridad - GRANTS y permisos
+        run: |
+          databricks workspace import_dir seguridad/ \
+            /Users/joose5573@gmail.com/databricks-smartdavid/seguridad \
+            --overwrite \
+            --exclude-hidden-files
+
+      # ── Paso 10: Deploy carpeta reversion ──────────────────────────
+      - name: Deploy reversion - DROP y REVOKE
+        run: |
+          databricks workspace import_dir reversion/ \
+            /Users/joose5573@gmail.com/databricks-smartdavid/reversion \
+            --overwrite \
+            --exclude-hidden-files
+
+      # ── Paso 11: Deploy carpeta dashboard ──────────────────────────
+      - name: Deploy dashboard - Evidencias
+        run: |
+          databricks workspace import_dir dashboard/ \
+            /Users/joose5573@gmail.com/databricks-smartdavid/dashboard \
+            --overwrite \
+            --exclude-hidden-files
+
+      # ── Paso 12: Deploy carpeta certificaciones ─────────────────────
+      - name: Deploy certificaciones
+        run: |
+          databricks workspace import_dir certificaciones/ \
+            /Users/joose5573@gmail.com/databricks-smartdavid/certificaciones \
+            --overwrite \
+            --exclude-hidden-files
+
+      # ── Paso 13: Verificar deploy exitoso ──────────────────────────
+      - name: Verify deployed structure
+        run: |
+          echo "============================================"
+          echo "✅ ESTRUCTURA DESPLEGADA EN DATABRICKS"
+          echo "============================================"
+          echo ""
+          echo "📁 /proceso:"
+          databricks workspace ls /Users/joose5573@gmail.com/databricks-smartdavid/proceso
+          echo ""
+          echo "📁 /scrips:"
+          databricks workspace ls /Users/joose5573@gmail.com/databricks-smartdavid/scrips
+          echo ""
+          echo "📁 /seguridad:"
+          databricks workspace ls /Users/joose5573@gmail.com/databricks-smartdavid/seguridad
+          echo ""
+          echo "📁 /reversion:"
+          databricks workspace ls /Users/joose5573@gmail.com/databricks-smartdavid/reversion
+          echo ""
+          echo "============================================"
+          echo "✅ Deploy completado exitosamente"
+          echo "============================================"

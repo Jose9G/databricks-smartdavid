@@ -1,0 +1,451 @@
+{
+  "datasets": [
+    {
+      "name": "50256db2",
+      "displayName": "Performance Summary of Collection Agents Dataset",
+      "queryLines": [
+        "SELECT \r\n",
+        "    colaborador,\r\n",
+        "    fuente_cartera,\r\n",
+        "    total_pagos_gestionados,\r\n",
+        "    contribuyentes_unicos,\r\n",
+        "    monto_total_recaudado\r\n",
+        "FROM smartdavid_catalog.golden.rendimiento_colaborador\r\n",
+        "ORDER BY monto_total_recaudado DESC;"
+      ]
+    },
+    {
+      "name": "caf31990",
+      "displayName": "Cartera Pendiente por Departamento",
+      "queryLines": [
+        "SELECT \r\n",
+        "    departamento,\r\n",
+        "    COUNT(*) AS contribuyentes_pendientes,\r\n",
+        "    ROUND(SUM(saldo), 2) AS saldo_por_recuperar\r\n",
+        "FROM smartdavid_catalog.golden.cartera_pendiente\r\n",
+        "WHERE departamento IS NOT NULL\r\n",
+        "GROUP BY departamento\r\n",
+        "ORDER BY saldo_por_recuperar DESC;"
+      ]
+    },
+    {
+      "name": "4d32dc82",
+      "displayName": "Pagos por Mes",
+      "queryLines": [
+        "SELECT \r\n",
+        "    mes_nombre,\r\n",
+        "    mes,\r\n",
+        "    anio,\r\n",
+        "    fuente_cartera,\r\n",
+        "    cantidad_pagos,\r\n",
+        "    monto_total,\r\n",
+        "    pagos_gestionados\r\n",
+        "FROM smartdavid_catalog.golden.pagos_mensual\r\n",
+        "ORDER BY anio, mes;"
+      ]
+    },
+    {
+      "name": "3933c2c6",
+      "displayName": "KPIs Resumen",
+      "queryLines": [
+        "SELECT\r\n",
+        "    COUNT(*)                          AS total_contribuyentes_pendientes,\r\n",
+        "    ROUND(SUM(saldo), 2)              AS saldo_total_por_recuperar\r\n",
+        "FROM smartdavid_catalog.golden.cartera_pendiente;"
+      ]
+    },
+    {
+      "name": "8cf1fac9",
+      "displayName": "Distribución PRICO vs MEPECO",
+      "queryLines": [
+        "SELECT \r\n",
+        "    fuente_cartera,\r\n",
+        "    SUM(total_pagos_gestionados) AS pagos_gestionados,\r\n",
+        "    SUM(monto_total_recaudado)   AS monto_recaudado\r\n",
+        "FROM smartdavid_catalog.golden.rendimiento_colaborador\r\n",
+        "GROUP BY fuente_cartera;"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "b8f49740",
+      "displayName": "Untitled page",
+      "layout": [
+        {
+          "widget": {
+            "name": "063a4a2a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "50256db2",
+                  "fields": [
+                    {
+                      "name": "colaborador",
+                      "expression": "`colaborador`"
+                    },
+                    {
+                      "name": "sum(monto_total_recaudado)",
+                      "expression": "SUM(`monto_total_recaudado`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "colaborador",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(monto_total_recaudado)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "fa7d4f68",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "caf31990",
+                  "fields": [
+                    {
+                      "name": "departamento",
+                      "expression": "`departamento`"
+                    },
+                    {
+                      "name": "sum(saldo_por_recuperar)",
+                      "expression": "SUM(`saldo_por_recuperar`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "departamento",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(saldo_por_recuperar)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "61c1d4f8",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "4d32dc82",
+                  "fields": [
+                    {
+                      "name": "mes_nombre",
+                      "expression": "`mes_nombre`"
+                    },
+                    {
+                      "name": "sum(monto_total)",
+                      "expression": "SUM(`monto_total`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "mes_nombre",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(monto_total)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "saldo-total-por-recuperar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3933c2c6",
+                  "fields": [
+                    {
+                      "name": "sum(saldo_total_por_recuperar)",
+                      "expression": "SUM(`saldo_total_por_recuperar`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Saldo Total por Recuperar"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(saldo_total_por_recuperar)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 12,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "3a74b912",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "8cf1fac9",
+                  "fields": [
+                    {
+                      "name": "count(fuente_cartera)",
+                      "expression": "COUNT(`fuente_cartera`)"
+                    },
+                    {
+                      "name": "sum(monto_recaudado)",
+                      "expression": "SUM(`monto_recaudado`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "count(fuente_cartera)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                },
+                "extra": [
+                  {
+                    "fieldName": "sum(monto_recaudado)"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 12,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
